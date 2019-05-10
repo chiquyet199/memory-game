@@ -4,38 +4,54 @@ import './Board.css'
 
 const Board = props => {
   const [cards, setCards] = useState(props.cards)
+  const [freezed, setFreezed] = useState(false)
   const [checker, setChecker] = useState([])
   const [completed, setCompleted] = useState([])
+  const reset = () => {
+    setChecker([])
+    setCompleted([])
+  }
   const onCardClick = card => () => {
-    if(checker.length <= 2){
+    if (freezed) return
+    if (checker.length <= 2) {
       const newChecker = [...checker, card]
       setChecker(newChecker)
-      const matched = newChecker.length === 2 && newChecker[0].type === newChecker[1].type
-      if(matched){
+      const matched =
+        newChecker.length === 2 &&
+        newChecker[0].type === newChecker[1].type
+      if (matched) {
         setCompleted([...completed, checker[0].type])
       }
-      if(newChecker.length === 2){
-        setTimeout(()=>{
+      if (newChecker.length === 2) {
+        setFreezed(true)
+        setTimeout(() => {
+          setFreezed(false)
           setChecker([])
-        },1000)
+        }, 1000)
       }
     }
   }
 
-  useEffect(()=>{
-    console.log(completed)
+  useEffect(() => {
     const newCards = cards.map(card => ({
       ...card,
-      flipped: checker.find(c => c.id === card.id) || completed.includes(card.type)
+      flipped:
+        checker.find(c => c.id === card.id) ||
+        completed.includes(card.type),
     }))
     setCards(newCards)
-  },[checker, completed])
+  }, [checker, completed])
 
   return (
     <div className="Board">
-      {cards.map(card => (
-        <Card {...card} onClick={onCardClick(card)} key={card.id} />
-      ))}
+      <div className="control">
+        <button onClick={reset}>Reset</button>
+      </div>
+      <div className="content">
+        {cards.map(card => (
+          <Card {...card} onClick={onCardClick(card)} key={card.id} />
+        ))}
+      </div>
     </div>
   )
 }

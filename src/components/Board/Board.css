@@ -1,4 +1,13 @@
-.Board{
+.Board .control{
+  padding: 20px
+}
+.Board .control button{
+  font-weight: 300;
+  font-size: 1.5rem;
+  padding: 10px 30px;
+}
+
+.Board .content{
   height: 450px;
   width: 450px;
   display: flex;

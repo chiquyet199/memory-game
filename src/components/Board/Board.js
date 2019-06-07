@@ -26,8 +26,8 @@ const Board = props => {
       if (newChecker.length === 2) {
         setFreezed(true)
         setTimeout(() => {
-          setFreezed(false)
           setChecker([])
+          setFreezed(false)
         }, 1000)
       }
     }

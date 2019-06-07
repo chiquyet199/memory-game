@@ -13,6 +13,7 @@ const Board = props => {
   }
   const onCardClick = card => () => {
     if (freezed) return
+    if (checker.length === 1 && checker[0].id === card.id) return
     if (checker.length <= 2) {
       const newChecker = [...checker, card]
       setChecker(newChecker)

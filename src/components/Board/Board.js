@@ -4,32 +4,33 @@ import './Board.css'
 
 const Board = props => {
   const [cards, setCards] = useState(props.cards)
-  const [freezed, setFreezed] = useState(false)
-  const [checker, setChecker] = useState([])
+  const [checkers, setCheckers] = useState([])
   const [completed, setCompleted] = useState([])
-  const reset = () => {
-    setChecker([])
-    setCompleted([])
-  }
   const onCardClick = card => () => {
-    if (freezed) return
-    if (checker.length === 1 && checker[0].id === card.id) return
-    if (checker.length <= 2) {
-      const newChecker = [...checker, card]
-      setChecker(newChecker)
-      const matched =
-        newChecker.length === 2 &&
-        newChecker[0].type === newChecker[1].type
-      if (matched) {
-        setCompleted([...completed, checker[0].type])
-      }
-      if (newChecker.length === 2) {
-        setFreezed(true)
-        setTimeout(() => {
-          setChecker([])
-          setFreezed(false)
-        }, 1000)
-      }
+    if (checkersFull(checkers) || cardAlreadyInCheckers(checkers, card)) return
+    const newCheckers = [...checkers, card]
+    setCheckers(newCheckers)
+    const cardsInCheckersMatched = validateCheckers(newCheckers)
+    if (cardsInCheckersMatched) {
+      setCompleted([...completed, newCheckers[0].type])
+    }
+    if (checkersFull(newCheckers)) {
+      resetCheckersAfter(1000)
+    }
+    function validateCheckers(checkers){
+      return checkers.length === 2 &&
+      checkers[0].type === checkers[1].type
+    }
+    function cardAlreadyInCheckers(checkers, card){
+      return checkers.length === 1 && checkers[0].id === card.id
+    }
+    function checkersFull(checkers){
+      return checkers.length === 2
+    }
+    function resetCheckersAfter(time) {
+      setTimeout(() => {
+        setCheckers([])
+      }, time)
     }
   }
 
@@ -37,22 +38,17 @@ const Board = props => {
     const newCards = cards.map(card => ({
       ...card,
       flipped:
-        checker.find(c => c.id === card.id) ||
+        checkers.find(c => c.id === card.id) ||
         completed.includes(card.type),
     }))
     setCards(newCards)
-  }, [checker, completed])
+  }, [checkers, completed])
 
   return (
     <div className="Board">
-      <div className="control">
-        <button onClick={reset}>Reset</button>
-      </div>
-      <div className="content">
-        {cards.map(card => (
-          <Card {...card} onClick={onCardClick(card)} key={card.id} />
-        ))}
-      </div>
+      {cards.map(card => (
+        <Card {...card} onClick={onCardClick(card)} key={card.id} />
+      ))}
     </div>
   )
 }
